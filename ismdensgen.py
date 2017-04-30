@@ -57,7 +57,7 @@ def GordonSurveyArea():
     height = pix_up_left[0][1] - y
     
     [x,y,width,height] = np.around([x,y,width,height])
-    return [x,y,width, height]
+    return [int(x), int(y), int(width), int(height)]
 
 def ISMData():
     Config = ConfigParser.ConfigParser()
@@ -262,8 +262,8 @@ def superEnergies(h1_1a,h1_cc):
     rv = np.random.normal(loc = 51.0, scale = 0.3, size = (h1_1a.size+h1_cc.size)) #0.4 variance ensures Hypernova, PISNs etc occur 1/1000 times "normal" CCSN (Janka 2012)     
     return 10**(rv-51.0)
 
-def superEnergiesIaCC(h1_1a,h1_cc):
-    rv1a = np.random.normal(loc = 51.0, scale = 0.1, size = h1_1a.size) #0.4 variance ensures Hypernova, PISNs etc occur 1/1000 times "normal" CCSN (Janka 2012)     
+def superEnergiesIaCC(size_ia = 100, size_cc = 100):
+    rv1a = np.random.normal(loc = 51.0, scale = 0.1, size = size) #0.4 variance ensures Hypernova, PISNs etc occur 1/1000 times "normal" CCSN (Janka 2012)     
     rvcc = np.random.normal(loc = 51.0, scale = 0.28, size = h1_cc.size) 
 
     return (10**(rv1a-51.0), 10**(rvcc-51.0))
@@ -281,27 +281,18 @@ def superEnergiesIaCC_test(h1_1a,h1_cc):
 
 def create_snarray(t_1a, t_cc,mass_1a,mass_cc,h1_1a,h1_cc,ek_1a,ek_cc):
     t = np.concatenate([t_1a, t_cc])
-    m = np.concatenate([mass_1a[0:t_1a.size],mass_cc[0:t_cc.size]])
-    h = np.concatenate([h1_1a[0:t_1a.size],h1_cc[0:t_cc.size]])
-   # ek = ek[0:t_1a.size+t_cc.size]
     ek = np.concatenate([ek_1a[0:t_1a.size], ek_cc[0:t_cc.size]])
-    n_1a = np.ones(t_1a.size)*10.0
-    n_cc = np.ones(t_cc.size)*12.0
-    n = np.concatenate([n_1a, n_cc])
-
     args = np.argsort(t)
-    t = t[args]
-    h = h[args]
-    m = m[args]
-    sn_ek = ek[args]
-    n = n[args]
-    return (t, h, m, sn_ek, n)
+    sorted_t = t[args]
+    sorted_ek = ek[args]
+    
+    return (sorted_t, sorted_ek)
 
 #-----------------------------------------------------------#                                                                                 
 #   POISSON PROCESS BIRTH TIME GENERATOR SUBROUTINE         #                                                                                            
 #-----------------------------------------------------------#                                                                                           
 
-def timegen(snrate):
+def timegen(snrate, t_size=100):
    t = np.arange(1.0e7)
    prob = np.random.rand(t.size)
    return t[np.where(prob<=snrate)]
