@@ -87,7 +87,7 @@ def Rimage():
 #Units of counts/s/pixels - I think 
     
 def UVimage():
-    FUVfile = Config.get('InputFiles', 'fuvmap')
+    FUVfile = Config.get('InputFiles', 'fuvmap') 
     lumFUV, headerFUV = fits.getdata(path_to_file+FUVfile, 0, header=True)
 
     #Convert /beam to /pixel
